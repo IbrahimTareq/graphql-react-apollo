@@ -10,7 +10,7 @@ const app = express();
 // connect to mlab database
 mongoose.connect(process.env.MONGOOSE_STRING, { useNewUrlParser: true });
 mongoose.connection.once('open', () => {
-    console.log('conneted to database');
+    console.log('connected to database');
 });
 
 // bind express with graphql
