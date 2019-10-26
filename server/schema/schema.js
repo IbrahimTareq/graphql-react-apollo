@@ -6,20 +6,24 @@ const {
     GraphQLString,
     GraphQLSchema,
     GraphQLID,
-    GraphQLInt
+    GraphQLInt,
+    GraphQLList
 } = graphql;
 
 // dummy data
 var books = [
-    { name: 'Name of the Wind', genre: 'Fantasy', id: '1' },
-    { name: 'The Final Empire', genre: 'Fantasy', id: '2' },
-    { name: 'The Long Earth', genre: 'Sci-Fi', id: '3' },
+    { name: 'Altered Carbon', genre: 'Sci-Fi', id: '1', authorId: '2' },
+    { name: 'The Sun Is Also A Star', genre: 'Romance', id: '2', authorId: '1' },
+    { name: 'Everything, Everything', genre: 'Romance', id: '3', authorId: '1' },
+    { name: 'Sapiens', genre: 'Non-fiction', id: '4', authorId: '3' },
+    { name: 'Homo Deus', genre: 'Non-fiction', id: '5', authorId: '3' },
+    { name: '21 Lessons for the 21st Century', genre: 'Non-fiction', id: '6', authorId: '3' },
 ];
 
 var authors = [
-    { name: 'Patrick Rothfuss', age: 44, id: '1' },
-    { name: 'Brandon Sanderson', age: 42, id: '2' },
-    { name: 'Terry Pratchett', age: 66, id: '3' }
+    { name: 'Nicola Yoon', age: 44, id: '1' },
+    { name: 'Richard K. Morgan', age: 42, id: '2' },
+    { name: 'Yuval Noah Harari', age: 66, id: '3' }
 ];
 
 const BookType = new GraphQLObjectType({
@@ -27,7 +31,13 @@ const BookType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
-        genre: { type: GraphQLString }
+        genre: { type: GraphQLString },
+        author: {
+            type: AuthorType,
+            resolve(parent, args){
+                return _.find(authors, { id: parent.authorId }); 
+            }
+        }
     })
 });
 
@@ -36,7 +46,13 @@ const AuthorType = new GraphQLObjectType({
     fields: ( ) => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
-        age: { type: GraphQLInt }
+        age: { type: GraphQLInt },
+        books: {
+            type: new GraphQLList(BookType),
+            resolve(parent, args){
+                return _.filter(books, { authorId: parent.id });
+            }
+        }
     })
 });
 
